@@ -356,7 +356,7 @@ h1,h2,h3,.btn,.tag,.badge,.brand,.eyebrow,.stage,.points{font-family:var(--font-
 .tray-main h4{color:#1b7a36}.tray-limit h4{color:#b25a00}
 .tray h4 small{font-family:var(--font-body);font-weight:700;font-size:11px;opacity:.85}
 .tray .foodgrid{margin:0!important}
-.foodgrid{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:9px!important}
+.foodgrid{display:grid!important;grid-template-columns:repeat(5,1fr)!important;gap:8px!important}
 .tray-limit .foodgrid{grid-template-columns:repeat(4,1fr)!important}
 .food{position:relative;aspect-ratio:1;min-height:0!important;border:0!important;border-radius:20px!important;padding:4px!important;background:linear-gradient(180deg,#fff,#f2f6ff)!important;box-shadow:0 6px 0 #c3cdea,0 10px 16px #1d2b5c1a!important;transition:transform .15s var(--pop);touch-action:none}
 .food .emoji{display:block;width:100%;height:100%;font-size:40px}
@@ -571,3 +571,5 @@ h1,h2,h3,.btn,.tag,.badge,.brand,.eyebrow,.stage,.points{font-family:var(--font-
 
 .shop-card .shop-continue,.nova-pause-card .nova-pause-next{position:sticky;bottom:-16px;box-shadow:0 6px 0 var(--g3),0 -10px 14px #ffffffcc}
 .shop-overlay{align-items:start}
+
+.qrjoin img{background:#fff;border-radius:14px;padding:4px;box-shadow:0 4px 0 #d8def0}

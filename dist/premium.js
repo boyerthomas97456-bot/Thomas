@@ -59,6 +59,16 @@ on(root => {
   root.querySelectorAll('.platefood').forEach(el => iconForEmojiSlot(el));
 });
 
+/* QR code généré sur place (aucun service externe) vers l'adresse du jeu */
+const shareURL = () => window.BATTLE_URL || (location.origin + location.pathname);
+function qrDataURL(text) {
+  if (!window.qrcode) return null;
+  try { const q = window.qrcode(0, 'M'); q.addData(text); q.make(); return q.createDataURL(8, 16); } catch (e) { return null; }
+}
+on(root => {
+  document.querySelectorAll('img[src*="api.qrserver.com"]').forEach(img => { const u = qrDataURL(shareURL()); if (u) { img.src = u; img.style.imageRendering = 'pixelated'; } });
+});
+
 /* Texte d'aide de l'écran SIGA (l'original affichait « [object Object] »). */
 on(root => {
   root.querySelectorAll('p.copy').forEach(p => { if (p.textContent === '[object Object]') p.textContent = 'Chaque cran d’écart enlève 10 points, jusqu’à 0. Le feedback t’indique si tu étais proche ou loin.'; });
@@ -309,7 +319,6 @@ function flyTo(img, target, done) {
 }
 
 /* ---------- 6. Compose ton assiette ---------- */
-const LIMIT_FAMILIES = ['plat composé', 'féculent préparé', 'boisson sucrée', 'produit sucré'];
 on(root => {
   const layout = root.querySelector('.meal-layout');
   if (!layout) return;
@@ -319,16 +328,14 @@ on(root => {
     plateEl.insertAdjacentHTML('afterbegin', '<i class="plate-cross"></i><div class="plate-zones"><span class="z-veg">Légumes & fruits</span><span class="z-starch">Féculents</span><span class="z-prot">Protéines</span><span class="z-drink">Boisson non sucrée</span></div>');
   }
   const grid = layout.querySelector('.foodgrid');
-  if (grid && round && !layout.querySelector('.tray')) {
-    const main = document.createElement('div'); main.className = 'tray tray-main';
-    main.innerHTML = '<h4>' + imgHTML('check', 'f3d-inline') + 'À favoriser pour construire l’assiette</h4>';
-    const limit = document.createElement('div'); limit.className = 'tray tray-limit';
-    limit.innerHTML = '<h4>' + imgHTML('heart', 'f3d-inline') + 'À limiter selon la fréquence <small>· possible, mais pas la base de l’assiette</small></h4><div class="foodgrid"></div>';
-    grid.before(main); main.append(grid); main.after(limit);
-    grid.querySelectorAll('.food').forEach(b => { if (LIMIT_FAMILIES.includes(round.foods[+b.dataset.i]?.[1])) limit.querySelector('.foodgrid').append(b); });
-    grid.querySelectorAll('.food, .tray-limit .food').forEach(enableDrag);
-    limit.querySelectorAll('.food').forEach(enableDrag);
+  /* Les 10 aliments restent ensemble : c'est au joueur de réfléchir à ses choix. */
+  if (grid && !grid.dataset.mixed) {
+    grid.dataset.mixed = '1';
+    /* Ordre mélangé à l'affichage (les réponses et les points ne changent pas) */
+    [...grid.querySelectorAll('.food')].map(b => [Math.random(), b]).sort((a, b) => a[0] - b[0]).forEach(([, b]) => grid.append(b));
+    grid.querySelectorAll('.food').forEach(enableDrag);
   }
+
   /* Placement libre : un aliment glissé reste là où on l'a lâché */
   if (grid && !layout.dataset.freeInit) { layout.dataset.freeInit = '1'; freePos.clear(); }
   layout.querySelectorAll('.platefood').forEach((el, n) => {
@@ -439,7 +446,7 @@ function run() {
   observer.disconnect();
   try { for (const d of decorators) { try { d(app); } catch (e) { console.warn('[premium]', e); } } }
   finally {
-    observer.observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'], characterData: true });
+    observer.observe(app, { childList: true, subtree: true, attributes: true, attributeFilter: ['class', 'src'], characterData: true });
     busy = false;
   }
 }
