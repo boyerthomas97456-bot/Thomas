@@ -566,6 +566,13 @@ function ham() {
   for (let i = 0; i < 3; i++) put(sph(.42, 32, 12), mat(i === 2 ? 0xf7a3a8 : 0xf28e95, { cc: .5, r: .4 }), i * .05, -.12 + i * .09, -i * .04, { s: [1.15, .08, .8], r: [.3, 0, -.08 * i] });
   return g;
 }
+function steak() {
+  const { g, put } = kit();
+  put(sph(.45, 32, 20), mat(0xc4473f, { bump: noiseTex('stk', 700), bs: 1.5, r: .55, cc: .3 }), 0, 0, 0, { s: [1.25, .3, .9] });
+  put(tor(.42, .05, 10, 40), mat(0xf6e3d0, { r: .5 }), 0, .02, 0, { r: [Math.PI / 2, 0, 0], s: [1.25, .9, 1] });
+  put(sph(.06, 10, 8), mat(C.leaf), .2, .14, .1, { s: [1.6, .3, .8] });
+  return g;
+}
 function plate() {
   const { g, put } = kit();
   put(lathe('plate', [[0, -.06], [.62, -.06], [.72, .02], [.78, .08], [.74, .1], [.6, .02], [0, .02]], 60), mat(0xffffff, { cc: 1, r: .12 }));
@@ -718,7 +725,7 @@ const MODELS = {
   sardines, cereal: () => cerealBox(), cerealplain: () => cerealBox('#f2b55a', 'CÉRÉALES', 'aromatisées'), honey,
   compote: () => compote(false), compotesugar: () => compote(true), frozen: frozenBag, readymeal: readyMeal, ham, plate,
   bolt, shield, bone, blood: () => drop(0xe02f3f, 'blood'), oildrop: () => drop(0xf2c230, 'oil'), dumbbell, rainbow, brain, eye,
-  heart, star: () => star(), check: () => check(true), cross: () => check(false), bomb, cart, sun: () => sunIcon(false),
+  heart, star: () => star(), check: () => check(true), cross: () => check(false), bomb, cart, steak, sun: () => sunIcon(false),
   moon: () => sunIcon(true), sunrise, wheat
 };
 export const FOOD_KEYS = Object.keys(MODELS);
@@ -742,21 +749,21 @@ const BY_NAME = [
   [/pringles|tuile/i, 'chips'], [/chips/i, 'chipsbag'], [/compote.*(sucre|sirop)|sucre ajouté/i, 'compotesugar'], [/compote/i, 'compote'],
   [/riz complet/i, 'brownrice'], [/riz/i, 'rice'], [/flocons|avoine/i, 'oats'], [/céréales complètes/i, 'wheat'], [/céréales|miel pops/i, 'cereal'],
   [/surgel/i, 'frozen'], [/haricots verts en conserve|légumes en conserve|conserve.*légume|légumes.*conserve/i, 'can'], [/pois chiches/i, 'chickpeas'],
-  [/haricots/i, 'greenbeans'], [/salade/i, 'lettuce'], [/thon/i, 'fish'], [/saumon/i, 'salmon'], [/sardine/i, 'sardines'], [/poisson/i, 'fish'],
+  [/haricots secs|légumineuse/i, 'lentils'], [/haricots/i, 'greenbeans'], [/salade/i, 'lettuce'], [/thon/i, 'fish'], [/saumon/i, 'salmon'], [/sardine/i, 'sardines'], [/poisson/i, 'fish'],
   [/nuggets|cordon/i, 'nuggets'], [/poulet/i, 'chicken'], [/jambon/i, 'ham'], [/lentille|légumineuse/i, 'lentils'],
   [/yop|yaourt à boire|boisson lactée/i, 'yop'], [/yaourt aromatisé|yaourt.*sucré/i, 'yogurtfruit'], [/yaourt/i, 'yogurt'],
   [/danette|dessert lacté choc|dessert au chocolat/i, 'chocopudding'], [/dessert industriel|dessert lacté|flan/i, 'pudding'],
   [/babybel/i, 'babybel'], [/fromage/i, 'cheese'], [/lait/i, 'milk'],
   [/coca.*z[ée]ro/i, 'sodazero'], [/soda|coca/i, 'soda'], [/énergisante/i, 'energy'], [/thé glacé/i, 'bubbletea'], [/thé/i, 'tea'],
   [/oasis|boisson aux fruits/i, 'fruitdrink'], [/jus/i, 'juice'], [/perrier|gazeuse/i, 'sparkling'], [/^eau|eau$/i, 'water'],
-  [/nouilles|cup noodles/i, 'noodles'], [/pâtes|panzani/i, 'pasta'], [/pain|baguette/i, 'bread'], [/pomme de terre/i, 'potato'],
+  [/nouilles|cup noodles/i, 'noodles'], [/pâtes|panzani/i, 'pasta'], [/pain|baguette/i, 'bread'], [/pommes? de terre/i, 'potato'],
   [/huile/i, 'oil'], [/beurre/i, 'butter'], [/sauce/i, 'sauce'], [/sel/i, 'salt'], [/sucre/i, 'sugar'], [/miel/i, 'honey'],
   [/kinder pingui|gâteau|dessert très sucré/i, 'cake'], [/kinder bueno|barre|lion|chocolat|nutella|m&m/i, 'chocolate'],
   [/biscuit fourré|petit écolier/i, 'sandwichcookie'], [/cookie|biscuit/i, 'cookie'], [/bonbon|skittles|confiserie/i, 'candy'],
   [/burger/i, 'burger'], [/frites/i, 'fries'], [/pizza/i, 'pizza'], [/hot-dog/i, 'hotdog'], [/plat préparé/i, 'readymeal'],
   [/fruit entier|fruit frais|orange/i, 'orange'], [/poire/i, 'pear'], [/banane/i, 'banana'], [/fraise/i, 'strawberry'], [/pomme/i, 'apple'],
   [/tomate/i, 'tomato'], [/brocoli/i, 'broccoli'], [/carotte/i, 'carrot'], [/poivron/i, 'pepper'], [/maïs/i, 'corn'], [/avocat/i, 'avocado'],
-  [/œuf|oeuf/i, 'egg'], [/légume/i, 'broccoli'], [/fruit/i, 'apple']
+  [/œuf|oeuf/i, 'egg'], [/viande|steak|bœuf/i, 'steak'], [/légume/i, 'broccoli'], [/fruit/i, 'apple']
 ];
 const BY_EMOJI = {
   '🍎': 'apple', '🍏': 'greenapple', '🍐': 'pear', '🍌': 'banana', '🍓': 'strawberry', '🍊': 'orange', '🍋': 'lemon', '🍅': 'tomato', '🍇': 'grapes',
@@ -764,7 +771,7 @@ const BY_EMOJI = {
   '🐠': 'salmon', '🥚': 'egg', '🫘': 'lentils', '🍚': 'rice', '🌾': 'oats', '🍝': 'pasta', '🍜': 'noodles', '🍞': 'bread', '🥛': 'milk', '🧀': 'cheese',
   '🥣': 'yogurt', '🍮': 'pudding', '💧': 'water', '🫧': 'sparkling', '🥤': 'soda', '🧃': 'juice', '🍵': 'tea', '🧋': 'bubbletea', '⚡': 'bolt',
   '🍪': 'cookie', '🍬': 'candy', '🍫': 'chocolate', '🍰': 'cake', '🍩': 'donut', '🍔': 'burger', '🍟': 'fries', '🍕': 'pizza', '🌭': 'hotdog',
-  '🥓': 'hotdog', '🧂': 'salt', '🥄': 'sugar', '🧈': 'butter', '🫒': 'oil', '🥫': 'can', '🍲': 'readymeal', '🥩': 'ham', '🍯': 'honey',
+  '🥓': 'hotdog', '🧂': 'salt', '🥄': 'sugar', '🧈': 'butter', '🫒': 'oil', '🥫': 'can', '🍲': 'readymeal', '🥩': 'steak', '🍯': 'honey',
   '❄️': 'frozen', '🍽️': 'plate', '💪': 'dumbbell', '🛡️': 'shield', '🦴': 'bone', '🩸': 'blood', '🧠': 'brain', '👁️': 'eye', '🌈': 'rainbow',
   '⭐': 'star', '💣': 'bomb', '🛒': 'cart', '❤️': 'heart', '✅': 'check', '❌': 'cross'
 };

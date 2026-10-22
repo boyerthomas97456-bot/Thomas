@@ -57,6 +57,7 @@ on(root => {
   root.querySelectorAll('.nutri-cart-mini > span').forEach(el => setIcon(el, 'cart'));
   root.querySelectorAll('.brief-bomb, .rush-bomb, .bomb-result-hero > span').forEach(el => setIcon(el, 'bomb'));
   root.querySelectorAll('.platefood').forEach(el => iconForEmojiSlot(el));
+  root.querySelectorAll('.lp-food b').forEach(el => iconForEmojiSlot(el, el.nextElementSibling?.textContent || el.closest('.lp-step,.lp-flip,.run-learn-item')?.querySelector('strong')?.textContent || ''));
 });
 
 /* QR code généré sur place (aucun service externe) vers l'adresse du jeu */
@@ -76,6 +77,22 @@ on(root => {
 
 /* Tri NOVA : le nom de l'aliment est maintenant affiché en haut du décor */
 on(root => { const tip = root.querySelector('.market-tip'); if (tip && tip.textContent.includes('s’affiche en bas')) tip.textContent = tip.textContent.replace('s’affiche en bas', 's’affiche en haut'); });
+
+/* Conseils « dans la vie de tous les jours » après chaque réponse */
+const tipHTML = t => `<div class="lp-tip daily"><b>💡 Dans la vie de tous les jours</b><p>${t}</p></div>`;
+on(root => {
+  if (typeof DAILY_TIPS === 'undefined') return;
+  const s = game();
+  const siga = root.querySelector('#feed.show .siga-reveal');
+  if (siga && !root.querySelector('#feed .daily')) { const n = +((siga.textContent.match(/SIGA (\d)/) || [])[1] || 0); if (n) root.querySelector('#feed .resultbox')?.insertAdjacentHTML('beforeend', tipHTML(DAILY_TIPS.siga(n))); }
+  const body = root.querySelector('#nutri-feedback .nutri-feedback');
+  if (body && !body.querySelector('.daily')) { const m = nutrientBodyMissions[Number(s.nutriBodyIndex) || 0]; if (m && DAILY_TIPS.body[m.zone]) body.insertAdjacentHTML('beforeend', tipHTML(DAILY_TIPS.body[m.zone])); }
+  const feed = root.querySelector('#feed.show');
+  if (feed && !feed.querySelector('.daily')) {
+    if (s.phase === 'plate') feed.querySelector('.resultbox')?.insertAdjacentHTML('beforeend', tipHTML(DAILY_TIPS.plate));
+    if (s.phase === 'who') feed.querySelector('.resultbox')?.insertAdjacentHTML('beforeend', tipHTML(DAILY_TIPS.who));
+  }
+});
 
 /* Score : petit rebond quand il change */
 let lastPoints = null;
