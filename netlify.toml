@@ -1,0 +1,3 @@
+# Hébergement Netlify : publie directement le dossier du jeu.
+[build]
+  publish = "dist"
