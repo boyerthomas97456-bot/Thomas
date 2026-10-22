@@ -310,8 +310,6 @@ function flyTo(img, target, done) {
 
 /* ---------- 6. Compose ton assiette ---------- */
 const LIMIT_FAMILIES = ['plat composé', 'féculent préparé', 'boisson sucrée', 'produit sucré'];
-const zoneOf = fam => /légume|fruit/.test(fam) ? 'veg' : /boisson/.test(fam) ? 'drink' : /féculent/.test(fam) ? 'starch' : /protéine|plat composé|laitier/.test(fam) ? 'prot' : 'center';
-const ZONE_POS = { veg: [[32, 32], [19, 45], [45, 17]], starch: [[68, 32], [81, 45], [55, 17]], prot: [[68, 68], [81, 55], [55, 83]], drink: [[32, 68], [19, 55], [45, 83]], center: [[50, 50], [50, 36], [50, 64]] };
 on(root => {
   const layout = root.querySelector('.meal-layout');
   if (!layout) return;
@@ -331,16 +329,12 @@ on(root => {
     grid.querySelectorAll('.food, .tray-limit .food').forEach(enableDrag);
     limit.querySelectorAll('.food').forEach(enableDrag);
   }
-  /* Chaque aliment se pose dans la zone de sa famille */
-  const items = layout.querySelectorAll('.platefood');
-  if (round && items.length) {
-    const used = {};
-    items.forEach((el, n) => {
-      const i = s.selected?.[n]; if (i === undefined) return;
-      const z = zoneOf(round.foods[i][1]), k = used[z] = (used[z] ?? -1) + 1, p = ZONE_POS[z][k % 3];
-      el.style.left = p[0] + '%'; el.style.top = p[1] + '%';
-    });
-  }
+  /* Placement libre : un aliment glissé reste là où on l'a lâché */
+  if (grid && !layout.dataset.freeInit) { layout.dataset.freeInit = '1'; freePos.clear(); }
+  layout.querySelectorAll('.platefood').forEach((el, n) => {
+    const i = s.selected?.[n], p = i !== undefined && freePos.get(i);
+    if (p) { el.style.left = p[0] + '%'; el.style.top = p[1] + '%'; }
+  });
   const feed = layout.parentElement?.querySelector('#feed.show');
   if (feed && plateEl && !plateEl.dataset.done) {
     plateEl.dataset.done = '1'; plateEl.classList.add('plate-done');
@@ -349,7 +343,14 @@ on(root => {
     plateEl.append(sp); setTimeout(() => sp.remove(), 2400);
   }
 });
-/* Glisser un aliment vers l'assiette = même effet qu'un toucher. */
+/* Positions choisies par le joueur (index de l'aliment → [x %, y %] dans l'assiette). */
+const freePos = new Map();
+const platePoint = (x, y) => {
+  const box = document.querySelector('.plate-foods')?.getBoundingClientRect(); if (!box) return null;
+  const px = (x - box.left) / box.width * 100, py = (y - box.top) / box.height * 100;
+  return Math.hypot(px - 50, py - 50) <= 50 ? [Math.max(12, Math.min(88, px)), Math.max(12, Math.min(88, py))] : null;
+};
+/* Glisser un aliment vers l'assiette = même effet qu'un toucher, mais il reste où on le lâche. */
 function enableDrag(btn) {
   if (btn.dataset.drag) return; btn.dataset.drag = '1';
   let start = null, ghost = null, suppress = false;
@@ -357,8 +358,9 @@ function enableDrag(btn) {
   btn.addEventListener('pointermove', e => {
     if (!start || btn.disabled) return;
     if (!ghost && Math.hypot(e.clientX - start.x, e.clientY - start.y) > 12) {
-      const src = btn.querySelector('img')?.src; if (!src) return;
-      ghost = document.createElement('img'); ghost.src = src; ghost.className = 'food-ghost'; document.body.append(ghost);
+      const src = btn.querySelector('img')?.src;
+      ghost = document.createElement(src ? 'img' : 'div'); if (src) ghost.src = src; else { ghost.textContent = btn.textContent.replace('✓', '').trim(); ghost.style.fontSize = '54px'; }
+      ghost.className = 'food-ghost'; document.body.append(ghost);
       try { btn.setPointerCapture(start.id); } catch (er) {}
     }
     if (ghost) {
@@ -372,7 +374,10 @@ function enableDrag(btn) {
       const plate = document.querySelector('.mealplate'), r = plate?.getBoundingClientRect();
       const over = r && e.clientX > r.left && e.clientX < r.right && e.clientY > r.top && e.clientY < r.bottom;
       plate?.classList.remove('drop-ok'); ghost.remove(); ghost = null; suppress = true; setTimeout(() => suppress = false, 50);
+      const spot = over && platePoint(e.clientX, e.clientY), idx = +btn.dataset.i;
+      if (spot) freePos.set(idx, spot);
       if (over && !btn.classList.contains('selected')) { suppress = false; btn.click(); suppress = true; setTimeout(() => suppress = false, 50); }
+      else if (spot) { const n = (game().selected || []).indexOf(idx), el = document.querySelectorAll('.platefood')[n]; if (el) { el.style.left = spot[0] + '%'; el.style.top = spot[1] + '%'; } }
     }
     start = null;
   };
@@ -443,3 +448,18 @@ if (iconsAvailable()) {
 }
 document.documentElement.classList.add('premium-ready');
 run();
+
+/* Assiette : un aliment déjà posé peut être déplacé au doigt, librement. */
+let movingFood = null;
+document.addEventListener('pointerdown', e => {
+  const el = e.target.closest?.('.platefood'); if (!el || document.querySelector('#feed.show')) return;
+  const n = [...document.querySelectorAll('.platefood')].indexOf(el), idx = game().selected?.[n];
+  if (idx === undefined) return;
+  movingFood = { el, idx }; el.setPointerCapture?.(e.pointerId); e.preventDefault();
+});
+document.addEventListener('pointermove', e => {
+  if (!movingFood) return;
+  const p = platePoint(e.clientX, e.clientY); if (!p) return;
+  movingFood.el.style.transition = 'none'; movingFood.el.style.left = p[0] + '%'; movingFood.el.style.top = p[1] + '%'; freePos.set(movingFood.idx, p);
+});
+document.addEventListener('pointerup', () => { if (movingFood) { movingFood.el.style.transition = ''; movingFood = null; } });
