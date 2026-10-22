@@ -3,6 +3,7 @@
    Utilisée pour les icônes des écrans et directement dans les jeux 3D. */
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 
 const V = (x, y, z = 0) => new THREE.Vector3(x, y, z);
 const V2 = (x, y) => new THREE.Vector2(x, y);
@@ -771,4 +772,29 @@ export function foodKey(emoji = '', name = '') {
   if (name) for (const [re, k] of BY_NAME) if (re.test(name)) return k;
   const e = String(emoji).trim();
   return BY_EMOJI[e] || BY_EMOJI[e.replace(/️/g, '')] || BY_EMOJI[e + '️'] || null;
+}
+
+/* Fusionne les maillages d'un groupe par matériau (beaucoup moins d'appels de dessin, même apparence).
+   Les sprites et les objets marqués userData.keep restent tels quels. */
+export function bakeGroup(root) {
+  root.updateMatrixWorld(true);
+  const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), byMat = new Map(), drop = [];
+  root.traverse(o => {
+    if (!o.isMesh || o.userData.keep || Array.isArray(o.material)) return;
+    let g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry.clone();
+    for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(k)) g.deleteAttribute(k);
+    if (!g.attributes.uv) return;
+    g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(inv, o.matrixWorld));
+    const key = o.material.uuid + (o.castShadow ? 's' : '');
+    if (!byMat.has(key)) byMat.set(key, { m: o.material, cast: o.castShadow, list: [] });
+    byMat.get(key).list.push(g); drop.push(o);
+  });
+  if (drop.length < 2) return root;
+  drop.forEach(o => o.parent.remove(o));
+  for (const { m, cast, list } of byMat.values()) {
+    const merged = mergeGeometries(list, false); if (!merged) continue;
+    const mesh = new THREE.Mesh(merged, m); mesh.castShadow = cast; mesh.receiveShadow = true; root.add(mesh);
+    list.forEach(g => g.dispose());
+  }
+  return root;
 }
