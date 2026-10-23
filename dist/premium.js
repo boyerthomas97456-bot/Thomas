@@ -57,6 +57,7 @@ on(root => {
   root.querySelectorAll('.nutri-cart-mini > span').forEach(el => setIcon(el, 'cart'));
   root.querySelectorAll('.brief-bomb, .rush-bomb, .bomb-result-hero > span').forEach(el => setIcon(el, 'bomb'));
   root.querySelectorAll('.platefood').forEach(el => iconForEmojiSlot(el));
+  root.querySelectorAll('.cp-food b').forEach(el => iconForEmojiSlot(el, el.nextElementSibling?.textContent || ''));
   root.querySelectorAll('.lp-food b').forEach(el => iconForEmojiSlot(el, el.nextElementSibling?.textContent || el.closest('.lp-step,.lp-flip,.run-learn-item')?.querySelector('strong')?.textContent || ''));
 });
 

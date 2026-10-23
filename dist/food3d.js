@@ -566,6 +566,36 @@ function ham() {
   for (let i = 0; i < 3; i++) put(sph(.42, 32, 12), mat(i === 2 ? 0xf7a3a8 : 0xf28e95, { cc: .5, r: .4 }), i * .05, -.12 + i * .09, -i * .04, { s: [1.15, .08, .8], r: [.3, 0, -.08 * i] });
   return g;
 }
+function olives() {
+  const { g, put } = kit();
+  [[-.25, -.1, .05, 0x6f8f2a], [.05, -.12, .2, 0x5a7a22], [.28, -.08, 0, 0x7a9a30], [-.05, .12, -.05, 0x3a4a1a], [.2, .15, -.15, 0x6f8f2a]].forEach(([x, y, z, c]) => put(sph(.16, 20, 16), mat(c, { cc: 1, r: .2 }), x, y, z, { s: [1, 1.35, 1] }));
+  put(sph(.18, 14, 8), mat(C.leaf), -.3, .3, 0, { s: [1.6, .2, .5], r: [0, 0, .5] });
+  put(cyl(.015, .015, .5, 6), mat(C.brown), -.05, .32, 0, { r: [0, 0, 1.2] });
+  return g;
+}
+function jam(col = 0xc81f3c, k = 'jam') {
+  const { g, put } = kit();
+  put(lathe('jam', [[0, -.42], [.33, -.42], [.37, -.3], [.37, .2], [.3, .28], [0, .28]]), mat(col, { op: .9, cc: 1, r: .12 }));
+  put(cyl(.32, .32, .12, 32), mat(0xd94d2b, { map: labelTex('jamlid', '#ffffff', '#d94d2b', '', '', ''), m: .2 }), 0, .34, 0);
+  put(cyl(.34, .34, .02, 32, true), mat(0xffffff, { map: labelTex('jam' + k, '#fff6e6', '#b5213a', 'CONFITURE', 'fraise', '🍓', 'cyl'), ds: true }), 0, -.08, 0);
+  return g;
+}
+function bakedApple() {
+  const { g, put } = kit();
+  put(cyl(.55, .45, .1, 40), mat(0xffffff, { cc: 1 }), 0, -.38, 0);
+  put(lathe('apple', [[0, -.46], [.22, -.47], [.42, -.33], [.5, -.05], [.46, .22], [.3, .38], [.1, .36], [0, .3]]), mat(0xa8452a, { cc: .9, r: .25, bump: noiseTex('bk', 400), bs: 1.5 }), 0, .05, 0, { s: .82 });
+  put(sph(.12, 12, 8), mat(0xe9a64e, { cc: .6 }), 0, .34, 0, { s: [1, .5, 1] });
+  put(cyl(.02, .03, .18, 8), mat(C.brown), 0, .42, 0);
+  return g;
+}
+function appleSlices() {
+  const { g, put } = kit();
+  const half = G('applehalf', () => new THREE.SphereGeometry(.4, 24, 18, 0, Math.PI));
+  put(half, mat(0xe8343a, { cc: .8 }), -.25, 0, 0, { r: [0, Math.PI / 2, 0] });
+  put(G('applecut', () => new THREE.CircleGeometry(.4, 24)), mat(0xfff3d6, { r: .5 }), -.25, 0, .001, { r: [0, Math.PI / 2, 0] });
+  for (let i = 0; i < 3; i++) { const sl = put(G('slice', () => new THREE.SphereGeometry(.36, 16, 12, 0, Math.PI / 3)), mat(0xfff3d6, { r: .5, ds: true }), .3, -.2 + i * .02, -.15 + i * .15, { r: [Math.PI / 2, 0, i * .3] }); }
+  return g;
+}
 function steak() {
   const { g, put } = kit();
   put(sph(.45, 32, 20), mat(0xc4473f, { bump: noiseTex('stk', 700), bs: 1.5, r: .55, cc: .3 }), 0, 0, 0, { s: [1.25, .3, .9] });
@@ -725,7 +755,7 @@ const MODELS = {
   sardines, cereal: () => cerealBox(), cerealplain: () => cerealBox('#f2b55a', 'CÉRÉALES', 'aromatisées'), honey,
   compote: () => compote(false), compotesugar: () => compote(true), frozen: frozenBag, readymeal: readyMeal, ham, plate,
   bolt, shield, bone, blood: () => drop(0xe02f3f, 'blood'), oildrop: () => drop(0xf2c230, 'oil'), dumbbell, rainbow, brain, eye,
-  heart, star: () => star(), check: () => check(true), cross: () => check(false), bomb, cart, steak, sun: () => sunIcon(false),
+  heart, star: () => star(), check: () => check(true), cross: () => check(false), bomb, cart, steak, olives, jam: () => jam(), jamdark: () => jam(0x7a1028, 'b'), bakedapple: bakedApple, appleslices: appleSlices, sun: () => sunIcon(false),
   moon: () => sunIcon(true), sunrise, wheat
 };
 export const FOOD_KEYS = Object.keys(MODELS);
@@ -746,6 +776,7 @@ export function buildFood(key, { size = 1, grounded = false } = {}) {
 
 /* Correspondance emoji / nom → modèle 3D. Le nom est prioritaire car un même emoji sert à plusieurs produits. */
 const BY_NAME = [
+  [/dessert aux fruits|dessert industriel aux fruits/i, 'pudding'], [/^olives?$/i, 'olives'], [/confiture b/i, 'jamdark'], [/confiture/i, 'jam'], [/pomme cuite/i, 'bakedapple'], [/pomme découpée|quartiers? de pomme/i, 'appleslices'],
   [/pringles|tuile/i, 'chips'], [/chips/i, 'chipsbag'], [/compote.*(sucre|sirop)|sucre ajouté/i, 'compotesugar'], [/compote/i, 'compote'],
   [/riz complet/i, 'brownrice'], [/riz/i, 'rice'], [/flocons|avoine/i, 'oats'], [/céréales complètes/i, 'wheat'], [/céréales|miel pops/i, 'cereal'],
   [/surgel/i, 'frozen'], [/haricots verts en conserve|légumes en conserve|conserve.*légume|légumes.*conserve/i, 'can'], [/pois chiches/i, 'chickpeas'],

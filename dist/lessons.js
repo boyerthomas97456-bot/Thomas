@@ -64,89 +64,7 @@ function renderLessonPage(p) {
   return h;
 }
 
-/* =====================================================================
-   1. COURS NOVA (avant la Mission Tri NOVA)
-   ===================================================================== */
-const NOVA_COURSE = [
-  { name: 'NOVA, c’est quoi ?', pages: [
-    { h: 'NOVA, c’est quoi ?', p: ['NOVA est une façon de <b>ranger les aliments selon la manière dont ils ont été fabriqués</b>. Elle a été créée par des chercheurs de l’université de São Paulo, au Brésil, et elle est utilisée dans de nombreux pays.', 'Elle compte <b>4 groupes</b>, du plus simple au plus fabriqué :'],
-      scale: [['1', 'Aliments bruts ou peu transformés', 'pomme, œuf, lentilles'], ['2', 'Ingrédients pour cuisiner', 'huile, beurre, sel, sucre'], ['3', 'Aliments transformés', 'pain de boulangerie, fromage, conserves'], ['4', 'Produits ultra-transformés', 'soda, bonbons, nuggets']] },
-    { h: 'Pourquoi regarder la transformation ?', p: ['Un même aliment de départ peut devenir des produits très différents. Une pomme peut rester une pomme, devenir une compote maison, ou un dessert industriel avec arômes et épaississants.', 'Plus un produit passe par des étapes industrielles et contient des ingrédients que l’on n’utilise pas dans une cuisine, plus il s’éloigne de l’aliment de départ.', 'Des études scientifiques observent qu’une consommation <b>très fréquente</b> de produits ultra-transformés est associée à davantage de problèmes de santé. C’est pour cela qu’il est utile de savoir les reconnaître.'],
-      compare: [[['🍎', 'Pomme', '1'], ['🍏', 'Compote 100 % pommes', '1'], ['🍎', 'Compote avec sucre', '3'], ['🍮', 'Dessert aux arômes', '4']]] },
-    { h: 'Ce que NOVA ne mesure pas', p: ['NOVA parle de <b>fabrication</b>. Elle ne compte <b>pas</b> les calories, les protéines, les vitamines ou le sucre d’un aliment.', 'Par exemple, des noix et de l’huile d’olive sont très riches en énergie, mais restent dans les groupes simples. À l’inverse, un soda « zéro sucre » apporte peu de calories, mais il est ultra-transformé.', 'NOVA est donc <b>un repère parmi d’autres</b>. Pour bien choisir, on regarde aussi la quantité, la fréquence et l’ensemble du repas.'],
-      quiz: { q: 'NOVA indique combien de calories contient un aliment.', opts: ['Vrai', 'Faux'], a: 1, why: 'NOVA classe les aliments selon leur fabrication, pas selon leurs calories ou leurs nutriments.' } }
-  ] },
-  { name: 'NOVA 1', pages: [
-    { badge: 'NOVA 1 · VERT', badgeCls: 'n1', h: 'Un aliment brut ou peu transformé, c’est quoi ?', p: ['Ce sont des aliments que l’on retrouve <b>proches de leur état naturel</b>. Par exemple, une pomme, un œuf, du poisson frais ou des lentilles.', 'Ils peuvent aussi avoir été lavés, coupés, congelés ou cuits <b>sans ajout d’autres ingrédients</b>. Même s’ils ont subi ces transformations simples, ils restent généralement dans cette première catégorie.'],
-      foods: [['🍎', 'Pomme'], ['🥚', 'Œuf'], ['🐟', 'Poisson frais'], ['🫘', 'Lentilles']] },
-    { badge: 'NOVA 1 · VERT', badgeCls: 'n1', h: 'Quelles familles d’aliments ?', p: ['Presque toutes les familles d’aliments ont des représentants en NOVA 1 :'],
-      groups: [['Fruits', [['🍎', 'Pomme'], ['🍌', 'Banane'], ['🍊', 'Orange']]], ['Légumes', [['🥕', 'Carotte'], ['🥦', 'Brocoli'], ['🍅', 'Tomate']]], ['Féculents', [['🍚', 'Riz'], ['🥔', 'Pommes de terre'], ['🍝', 'Pâtes nature']]], ['Aliments protéinés', [['🥚', 'Œufs'], ['🐟', 'Poisson'], ['🥩', 'Viande fraîche']]], ['Légumineuses', [['🫘', 'Lentilles'], ['🫘', 'Haricots secs']]], ['Produits laitiers nature', [['🥛', 'Lait'], ['🥣', 'Yaourt nature']]]] },
-    { badge: 'NOVA 1 · VERT', badgeCls: 'n1', h: 'Les transformations simples autorisées', p: ['Un aliment reste en NOVA 1 quand on lui fait seulement des gestes simples, <b>sans rien ajouter</b> :'],
-      steps: ['<b>Laver, éplucher, couper</b> : une salade lavée en sachet.', '<b>Congeler</b> : des haricots verts surgelés nature.', '<b>Sécher ou moudre</b> : des flocons d’avoine, de la farine, des lentilles sèches.', '<b>Pasteuriser</b> (chauffer pour conserver) : le lait.', '<b>Cuire à l’eau ou à la vapeur</b> : un riz nature.'],
-      tip: 'Les légumes surgelés nature sont aussi intéressants que les frais, souvent moins chers et déjà prêts à cuire.' },
-    { badge: 'NOVA 1 · VERT', badgeCls: 'n1', h: 'Exemples concrets et erreurs fréquentes', p: ['Le mot « surgelé » ou « en sachet » ne change pas le groupe : c’est <b>ce qu’on ajoute</b> qui compte.'],
-      compare: [[['🥬', 'Haricots verts surgelés nature', '1'], ['🥫', 'Haricots verts en conserve au sel', '3']], [['🍊', 'Orange', '1'], ['🧃', 'Boisson aux fruits aromatisée', '4']]],
-      warn: 'Penser qu’un aliment « industriel » est forcément ultra-transformé. Un sachet de lentilles sèches ou un lait pasteurisé restent en NOVA 1.',
-      quiz: { q: 'Des épinards surgelés nature, sans sauce : quel groupe ?', opts: ['NOVA 1', 'NOVA 4'], a: 0, why: 'La congélation est une transformation simple : sans ajout, ils restent en NOVA 1.' } }
-  ] },
-  { name: 'NOVA 2', pages: [
-    { badge: 'NOVA 2 · JAUNE', badgeCls: 'n2', h: 'Les ingrédients pour cuisiner', p: ['Ce sont des produits tirés d’un aliment ou de la nature, qu’on ne mange <b>presque jamais seuls</b> : on les utilise pour cuisiner, assaisonner ou sucrer.', 'On les obtient en pressant (l’huile vient des olives ou du colza), en séparant (le beurre vient de la crème), en raffinant (le sucre vient de la betterave) ou en récoltant (le sel, le miel).'],
-      foods: [['🫒', 'Huile d’olive'], ['🧈', 'Beurre'], ['🥄', 'Sucre'], ['🧂', 'Sel'], ['🍯', 'Miel']] },
-    { badge: 'NOVA 2 · JAUNE', badgeCls: 'n2', h: 'Comment les utiliser au quotidien ?', p: ['Ils servent à préparer des plats maison avec des aliments du groupe 1 : des légumes poêlés avec un filet d’huile, une omelette avec une noisette de beurre.', 'Ce qui compte surtout, c’est la <b>quantité</b> : une cuillère d’huile pour cuisiner des légumes n’apporte pas la même chose qu’un plat qui baigne dans l’huile.'],
-      tip: 'Pour les huiles, varier est une bonne idée : l’huile de colza et l’huile de noix apportent des oméga-3, l’huile d’olive est pratique pour la cuisson douce.',
-      warn: 'Croire que NOVA 2 est « meilleur » ou « moins bon » que NOVA 3. Ce sont des ingrédients, pas des repas : on ne les compare pas de la même façon.',
-      quiz: { q: 'Le miel est classé…', opts: ['NOVA 2, ingrédient pour sucrer', 'NOVA 4, produit ultra-transformé'], a: 0, why: 'Le miel est récolté puis extrait : c’est un ingrédient culinaire, comme le sucre.' } }
-  ] },
-  { name: 'NOVA 3', pages: [
-    { badge: 'NOVA 3 · ORANGE', badgeCls: 'n3', h: 'Un aliment transformé, c’est quoi ?', p: ['C’est un aliment du groupe 1 auquel on a ajouté un ingrédient du groupe 2 (<b>sel, sucre, huile ou vinaigre</b>) pour le conserver plus longtemps ou lui donner plus de goût.', 'La recette reste <b>courte</b> : en général 2 ou 3 ingrédients que tu pourrais avoir dans ta cuisine.'],
-      compare: [[['🥕', 'Légumes', '1'], ['🧂', '+ sel', '2'], ['🥫', 'Légumes en conserve', '3']]] },
-    { badge: 'NOVA 3 · ORANGE', badgeCls: 'n3', h: 'Des exemples de NOVA 3', p: ['Beaucoup de produits du quotidien sont dans ce groupe :'],
-      foods: [['🍞', 'Pain de boulangerie (farine, eau, sel, levure)'], ['🧀', 'Fromage'], ['🥫', 'Légumes en conserve'], ['🐟', 'Sardines à l’huile'], ['🥫', 'Pois chiches en conserve'], ['🍎', 'Compote avec sucre']] },
-    { badge: 'NOVA 3 · ORANGE', badgeCls: 'n3', h: 'Au quotidien', p: ['Les conserves simples sont <b>pratiques, pas chères et se gardent longtemps</b>. Elles ont toute leur place dans des repas équilibrés.', 'On regarde simplement la quantité de sel ou de sucre ajoutée, et on adapte le reste du repas.'],
-      tip: 'Rincer les légumes ou les légumineuses en conserve sous l’eau enlève une partie du sel ajouté.',
-      quiz: { q: 'Un pain fait seulement avec farine, eau, sel et levure est…', opts: ['NOVA 3', 'NOVA 4'], a: 0, why: 'Recette courte avec des ingrédients de cuisine : c’est un aliment transformé, NOVA 3.' } }
-  ] },
-  { name: 'NOVA 4', pages: [
-    { badge: 'NOVA 4 · ROUGE', badgeCls: 'n4', h: 'Un produit ultra-transformé, c’est quoi ?', p: ['Ce sont des produits <b>fabriqués industriellement</b>, souvent avec une longue liste d’ingrédients.', 'On y trouve des substances qu’on n’utilise presque jamais à la maison : sirop de glucose, protéines hydrolysées, huiles hydrogénées… et des <b>additifs</b> qui changent la couleur, le goût ou la texture (arômes, colorants, émulsifiants, édulcorants).'] },
-    { badge: 'NOVA 4 · ROUGE', badgeCls: 'n4', h: 'Des exemples de NOVA 4', p: ['On les trouve dans presque tous les rayons :'],
-      foods: [['🥤', 'Sodas'], ['🍬', 'Bonbons'], ['🍪', 'Biscuits industriels'], ['🍯', 'Céréales aromatisées'], ['🍗', 'Nuggets'], ['🍜', 'Nouilles instantanées'], ['🍲', 'Plats préparés avec additifs'], ['🍮', 'Desserts aux arômes']] },
-    { badge: 'NOVA 4 · ROUGE', badgeCls: 'n4', h: 'Comment les reconnaître au magasin ?', p: ['Retourne le paquet et lis la <b>liste des ingrédients</b> :'],
-      steps: ['Elle est <b>longue</b> (souvent plus de 5 ingrédients).', 'Elle contient des mots que tu n’as <b>pas dans ta cuisine</b> : sirop de glucose, maltodextrine, protéines de lait hydrolysées…', 'Elle contient des <b>additifs « cosmétiques »</b> : arôme, colorant, émulsifiant (E471…), édulcorant, épaississant.'],
-      tip: 'Si tu hésites entre deux produits du même rayon, celui dont la liste d’ingrédients est la plus courte et la plus compréhensible est généralement le moins transformé.' },
-    { badge: 'NOVA 4 · ROUGE', badgeCls: 'n4', h: 'Sans culpabiliser', p: ['Ces produits sont pratiques, souvent bons, et peuvent faire partie de la vie. Il ne s’agit pas de les interdire.', 'L’idée est de <b>ne pas en faire la base de tous les repas</b>, et de savoir les repérer pour choisir en connaissance de cause : par exemple un dessert ultra-transformé de temps en temps, et le plus souvent un fruit ou un yaourt nature.'],
-      warn: 'Penser qu’un seul additif suffit pour classer en NOVA 4. C’est l’ensemble de la recette et le type d’ingrédients qui comptent.',
-      quiz: { q: 'Des biscuits avec « sirop de glucose, arôme, émulsifiant » sont…', opts: ['NOVA 3', 'NOVA 4'], a: 1, why: 'Ingrédients industriels et additifs cosmétiques : ce sont des marqueurs d’ultra-transformation.' } }
-  ] },
-  { name: 'Comparer', pages: [
-    { h: 'Même aliment de départ, groupes différents', p: ['Ce qui fait changer de groupe, c’est <b>ce qu’on ajoute</b> et <b>comment c’est fabriqué</b> :'],
-      compare: [[['🥛', 'Lait nature', '1'], ['🥣', 'Yaourt nature', '1'], ['🧀', 'Fromage', '3'], ['🍓', 'Yaourt aromatisé avec arômes', '4']], [['🌾', 'Flocons d’avoine', '1'], ['🍯', 'Céréales aromatisées', '4']]] },
-    { h: 'D’autres comparaisons utiles', p: ['Dans chaque rayon, il existe souvent une version simple et une version plus fabriquée :'],
-      compare: [[['🍗', 'Poulet frais', '1'], ['🍗', 'Nuggets', '4']], [['🍞', 'Pain de boulangerie', '3'], ['🍞', 'Pain de mie avec additifs', '4']], [['💧', 'Eau', '1'], ['🥤', 'Soda', '4']]],
-      tip: 'Remplacer une seule habitude, par exemple le soda du midi par de l’eau pétillante, est déjà un vrai changement.' }
-  ] },
-  { name: 'Au quotidien', pages: [
-    { h: 'Mes 3 réflexes pendant les courses', steps: ['<b>Lire la liste d’ingrédients</b> : courte et compréhensible = produit plus simple.', '<b>Comparer deux produits du même rayon</b> : par exemple deux compotes ou deux pains.', '<b>Construire la base des repas</b> avec des aliments NOVA 1 et 3, cuisinés avec un peu de NOVA 2, et garder les NOVA 4 pour certaines occasions.'],
-      tip: 'Une liste de courses préparée à la maison aide à choisir plus calmement, sans se laisser guider seulement par les promotions.' },
-    { h: 'À toi de jouer !', p: ['Dans la Mission Tri NOVA, un aliment arrive sur le tapis : touche le bac qui correspond à son groupe. Après chaque aliment, le Professeur Fraise t’explique la bonne réponse.'],
-      scale: [['1', 'Brut ou peu transformé'], ['2', 'Ingrédient pour cuisiner'], ['3', 'Transformé (recette courte)'], ['4', 'Ultra-transformé (ingrédients industriels, additifs)']],
-      quiz: { q: 'Des pois chiches en conserve avec eau et sel sont…', opts: ['NOVA 1', 'NOVA 3', 'NOVA 4'], a: 1, why: 'Un aliment du groupe 1 + du sel pour le conserver : c’est un aliment transformé, NOVA 3.' } }
-  ] }
-];
-
-/* =====================================================================
-   2. LEÇON SIGA
-   ===================================================================== */
-const SIGA_COURSE = [{ name: 'Le score SIGA', pages: [
-  { h: 'Le SIGA, c’est quoi ?', p: ['Le SIGA est un <b>score de 1 à 7</b> donné à un produit. Comme NOVA, il regarde comment l’aliment a été fabriqué.', 'Mais il ajoute deux informations : la présence de <b>marqueurs d’ultra-transformation</b> (additifs, ingrédients industriels) et l’<b>équilibre du produit</b> en gras, en sucre et en sel.', 'Plus le chiffre est petit, plus le produit est simple et équilibré.'] },
-  { h: 'Les groupes 1 à 4', scale: [['1', 'Non transformé', 'lait demi-écrémé, pomme'], ['2', 'Peu transformé', 'compote sans sucres ajoutés'], ['3', 'Transformé équilibré', 'Babybel'], ['4', 'Transformé « gourmand »', 'boisson lactée aromatisée']],
-    p: ['« Gourmand » veut dire que le produit est <b>plus riche en gras, en sucre ou en sel</b>.'] },
-  { h: 'Les groupes 5 à 7', scale: [['5', 'Ultra-transformé équilibré', 'dessert industriel aux fruits'], ['6', 'Ultra-transformé gourmand', 'nuggets, gâteau enrobé'], ['7', 'Ultra-transformé à limiter', 'nouilles instantanées, bonbons']],
-    p: ['Un produit en groupe 6 ou 7 n’est pas interdit : le chiffre aide à savoir lesquels garder pour <b>de temps en temps</b>.'] },
-  { h: 'NOVA ou SIGA : quelle différence ?', p: ['<b>NOVA</b> répond à la question : « Comment ce produit a-t-il été fabriqué ? »', '<b>SIGA</b> répond à : « Comment a-t-il été fabriqué, et est-il plutôt équilibré ? »', 'Les deux ne jugent qu’<b>un produit</b>, jamais un repas entier ni une personne.'],
-    tip: 'Des applications de scan alimentaire affichent ce type de score en magasin : c’est pratique pour comparer deux produits du même rayon.' },
-  { h: 'À toi de jouer !', p: ['Pour chaque produit, déplace le curseur sur le score SIGA que tu imagines. Plus tu es proche, plus tu gagnes de points : chaque cran d’écart enlève 10 points.', 'Après ta réponse, le Professeur Fraise t’explique le vrai score.'],
-    quiz: { q: 'Un produit « gourmand » dans le SIGA est…', opts: ['Plus riche en gras, sucre ou sel', 'Interdit'], a: 0, why: 'Le mot « gourmand » décrit l’équilibre du produit. Aucun produit n’est interdit.' } }
-] }];
+/* Les cours NOVA et SIGA sont dans courses.js. */
 
 /* =====================================================================
    3. MISSION NUTRIMENTS
@@ -237,14 +155,6 @@ const WHO_COURSE = [{ name: 'Mener l’enquête', pages: [
 (() => {
   const baseHome = renderHome;
   renderHome = function () { state.lessonSeen = {}; baseHome(); };
-
-  /* NOVA et SIGA */
-  const baseLesson = renderLesson;
-  renderLesson = function (which) {
-    if (which === 'nova') lessonPager({ id: 'nova', tag: 'Avant le défi · cours NOVA', title: 'Comprendre la classification NOVA', sub: 'Des petites pages pour comprendre, avec des exemples. Tu peux naviguer entre les chapitres.', chapters: NOVA_COURSE, progress: 0, doneLabel: 'J’ai compris, au tri ! →', done: () => { state.idx = 0; renderNova(0); } });
-    else if (which === 'siga') lessonPager({ id: 'siga', tag: 'Avant le défi · SIGA', title: 'Comprendre le score SIGA', chapters: SIGA_COURSE, progress: 1, doneLabel: 'Compris, on joue ! →', done: () => { state.idx = 1; renderSiga(0); } });
-    else baseLesson(which);
-  };
 
   /* Nutriments : leçon complète puis labo, et petite leçon avant les courses */
   renderNutrientLesson = function () {
