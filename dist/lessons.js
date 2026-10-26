@@ -1,5 +1,5 @@
 /* =====================================================================
-   Battle du panier — leçons en petites pages.
+   NutriVerse — leçons en petites pages.
    Chaque mini-jeu est précédé d'une leçon courte, découpée en pages,
    avec des exemples concrets, des illustrations et de petits quiz
    (sans points). Les règles et les scores des jeux ne changent pas.

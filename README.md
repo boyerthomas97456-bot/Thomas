@@ -1,6 +1,6 @@
-# Battle du panier
+# NutriVerse
 
-Version actuelle du jeu éducatif sur l'alimentation qualitative.
+NutriVerse — l’univers de l’alimentation qualitative : cours interactifs et mini-jeux 3D (anciennement « Battle du panier »).
 
 ## Lancer le site
 
@@ -16,3 +16,5 @@ Publier le contenu du dossier `dist` sur un hébergeur statique (les modules 3D 
 - `icons3d.js` : transforme ces modèles 3D en images pour les écrans.
 
 Si un module 3D ne se charge pas, le jeu reste jouable avec son rendu simple.
+
+Le titre 3D de l'accueil utilise la police Baloo 2 (SIL Open Font License 1.1), convertie dans `nutriverse-font.json`. Le QR code utilise `qrcode.js` (qrcode-generator, licence MIT).

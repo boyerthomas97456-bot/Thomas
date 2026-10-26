@@ -1,5 +1,5 @@
 /* =====================================================================
-   Battle du panier — couche graphique premium.
+   NutriVerse — couche graphique premium.
    Ce module observe l'écran affiché et l'habille (images 3D, décors,
    animations). Il ne modifie ni les règles, ni les scores, ni les
    boutons : il ne lit l'état du jeu que pour savoir quoi afficher.
@@ -7,6 +7,8 @@
 import * as THREE from 'three';
 import { buildFood, foodKey, mat } from './food3d.js';
 import { iconURL, spinURL, sharedEnvironment, studioLights, iconsAvailable } from './icons3d.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 const app = document.getElementById('app');
 const EMOJI_RE = /\p{Extended_Pictographic}/u;
@@ -113,6 +115,80 @@ on(root => {
   box.innerHTML = items.map(([k, x, y], i) => { const s = iconURL(k); return s ? `<img src="${s}" alt="" style="left:${x}%;top:${y}%;animation-delay:${-i * .7}s">` : ''; }).join('');
   hero.prepend(box);
 });
+
+/* ---------- Page d'accueil : titre NutriVerse en 3D ---------- */
+on(root => {
+  root.querySelectorAll('.nv-ico').forEach(el => iconForEmojiSlot(el));
+  const stage = root.querySelector('#nv-stage');
+  if (stage && !stage.dataset.on) { stage.dataset.on = '1'; mountTitle(stage); }
+});
+let titleFont = null;
+async function mountTitle(stage) {
+  let r;
+  try {
+    titleFont ??= new FontLoader().parse(await (await fetch('nutriverse-font.json')).json());
+    r = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  } catch (e) { return; }
+  if (!stage.isConnected) { r.dispose(); return; }
+  r.setPixelRatio(Math.min(devicePixelRatio, 2)); r.outputColorSpace = THREE.SRGBColorSpace;
+  r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = 1.1; r.setClearColor(0, 0);
+  const scene = new THREE.Scene(); scene.environment = sharedEnvironment(r); studioLights(scene, 1.1);
+  const cam = new THREE.PerspectiveCamera(35, 1, .1, 100);
+  /* Lettres : « Nutri » en verts frais, « Verse » en violets et bleus */
+  const word = 'NutriVerse', cols = [0x2fcf63, 0x47d873, 0x5fdd84, 0x77e294, 0x8fe7a5, 0x8d6bff, 0x7a62ff, 0x6a6dff, 0x5a7bff, 0x4a8bff];
+  const letters = [], title = new THREE.Group(); scene.add(title);
+  let x = 0;
+  [...word].forEach((ch, i) => {
+    const geo = new TextGeometry(ch, { font: titleFont, size: 1, height: .38, depth: .38, curveSegments: 8, bevelEnabled: true, bevelThickness: .07, bevelSize: .045, bevelSegments: 4 });
+    geo.computeBoundingBox();
+    const c = new THREE.Color(cols[i]);
+    const face = new THREE.MeshPhysicalMaterial({ color: c, roughness: .22, clearcoat: 1, clearcoatRoughness: .15 });
+    const side = new THREE.MeshPhysicalMaterial({ color: c.clone().multiplyScalar(.55), roughness: .35, clearcoat: .6 });
+    const m = new THREE.Mesh(geo, [face, side]);
+    const ha = titleFont.data.glyphs[ch].ha / titleFont.data.resolution;
+    m.position.x = x; x += ha * .96;
+    m.userData = { base: m.position.clone(), delay: i * .09 };
+    title.add(m); letters.push(m);
+  });
+  const width = x; title.position.x = -width / 2; title.position.y = -.42;
+  /* Anneau planétaire et aliments en orbite */
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1, .012, 8, 120), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: .55 }));
+  ring.rotation.x = Math.PI / 2.25; ring.scale.set(width * .58, width * .58, 1); scene.add(ring);
+  const orbiters = ['apple', 'broccoli', 'carrot', 'strawberry', 'orange', 'water', 'banana'].map((k, i, a) => {
+    const g = buildFood(k, { size: .62 }); scene.add(g); return { g, a: i / a.length * Math.PI * 2 };
+  });
+  stage.prepend(r.domElement);
+  stage.closest('.nv-hero')?.classList.add('has-3d');
+  let w = 0, h = 0, start = performance.now(), jump = -10;
+  stage.addEventListener('pointerdown', () => { jump = (performance.now() - start) / 1000; });
+  const ease = t => t < 0 ? 0 : t > 1 ? 1 : 1 - Math.pow(1 - t, 3) * Math.cos(t * 9) * (1 - t) - (1 - t) * 0;
+  const loop = now => {
+    if (!stage.isConnected) { r.dispose(); r.forceContextLoss(); return; }
+    requestAnimationFrame(loop);
+    const rw = stage.clientWidth, rh = stage.clientHeight;
+    if (rw !== w || rh !== h) { w = rw; h = rh; r.setSize(w, h, false); cam.aspect = w / h; const fitW = (width * 1.32) / 2 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2)) / cam.aspect; cam.position.set(0, .7, Math.max(fitW, 5)); cam.lookAt(0, 0, 0); cam.updateProjectionMatrix(); }
+    const t = (now - start) / 1000;
+    letters.forEach((m, i) => {
+      const k = Math.min(1, Math.max(0, (t - m.userData.delay) / .9));
+      const drop = reduceMotion ? 0 : (1 - ease(k)) * 4;
+      const wave = reduceMotion ? 0 : Math.sin(t * 2.2 + i * .55) * .08 * Math.min(1, t / 2);
+      const hop = Math.max(0, Math.sin(Math.min(Math.PI, (t - jump - i * .05) * 5))) * .6 * (t - jump < 1.2 ? 1 : 0);
+      m.position.y = m.userData.base.y + drop + wave + hop;
+      m.rotation.x = reduceMotion ? 0 : (1 - k) * -1.2;
+      m.scale.setScalar(.4 + .6 * Math.min(1, k * 1.4));
+    });
+    title.rotation.y = reduceMotion ? 0 : Math.sin(t * .6) * .22;
+    title.rotation.x = reduceMotion ? 0 : -.08 + Math.sin(t * .8) * .04;
+    orbiters.forEach((o, i) => {
+      const a = o.a + (reduceMotion ? 0 : t * .45), rx = width * .58, rz = width * .58 * Math.cos(Math.PI / 2.25);
+      o.g.position.set(Math.cos(a) * rx, Math.sin(a) * rz * .55 - .1, Math.sin(a) * rz * 1.6);
+      o.g.rotation.y = t * 1.2 + i; o.g.visible = t > .8 + i * .1;
+    });
+    ring.rotation.z = t * .1;
+    r.render(scene, cam);
+  };
+  requestAnimationFrame(loop);
+}
 
 /* Fin de partie : Professeur Fraise en grand */
 on(root => {

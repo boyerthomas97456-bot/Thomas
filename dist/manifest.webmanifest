@@ -1,7 +1,7 @@
 {
-  "name": "Battle du panier",
-  "short_name": "Battle panier",
-  "description": "Jeu éducatif sur l'alimentation : 11 défis avec le Professeur Fraise.",
+  "name": "NutriVerse",
+  "short_name": "NutriVerse",
+  "description": "NutriVerse, l'univers de l'alimentation qualitative : 11 défis avec le Professeur Fraise.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",

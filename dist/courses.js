@@ -1,5 +1,5 @@
 /* =====================================================================
-   Battle du panier — cours NOVA et SIGA.
+   NutriVerse — cours NOVA et SIGA.
    Une seule page visible à la fois, organisée par catégorie
    (« NOVA 1 — Page 2 sur 4 »), avec animations pédagogiques,
    questions de compréhension et corrections immédiates.
